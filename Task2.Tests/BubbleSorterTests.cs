@@ -28,7 +28,7 @@ namespace Task2.Tests
                 new int[] {13,15,42,-7,16}
             };
 
-            BubbleSorter.SortBySumAscending(actual);
+            BubbleSorter.Sort(actual,new SortBySumAscending());
 
             Assert.AreEqual(expected, actual);
         }
@@ -49,7 +49,7 @@ namespace Task2.Tests
                 new int[] {0,25,0,0,0}
             };
 
-            BubbleSorter.SortBySumDescending(actual);
+            BubbleSorter.Sort(actual, new SortBySumDescending());
 
             Assert.AreEqual(expected, actual);
         }
@@ -70,7 +70,7 @@ namespace Task2.Tests
                  new int[] {13,15,42,-7,16}
             };
 
-            BubbleSorter.SortByMaxAscending(actual);
+            BubbleSorter.Sort(actual, new SortByMaxAscending());
 
             Assert.AreEqual(expected, actual);
         }
@@ -92,95 +92,38 @@ namespace Task2.Tests
                 new int[] {1,3,6,7,9}
             };
 
-            BubbleSorter.SortByMaxDescending(actual);
-
-            Assert.AreEqual(expected, actual);
-        }
-
-        [Test]
-        public void SortByMinAscending_JaggedArray_ExpectedSortedByMinElementsOfRowsArray()
-        {
-            int[][] actual = {
-                new int[] {1,3,6,7,9},
-                new int[] {0,25,0,0,0},
-                new int[] {11,22,24},
-                new int[] {13,15,42,-7,16}
-            };
-            int[][] expected = {
-                new int[] {13,15,42,-7,16},
-                new int[] {0,25,0,0,0},
-                new int[] {1,3,6,7,9},
-                new int[] {11,22,24}
-            };
-
-            BubbleSorter.SortByMinAscending(actual);
+            BubbleSorter.Sort(actual, new SortByMaxDescending());
 
             Assert.AreEqual(expected, actual);
         }
 
        
-
-        
-        
-        [Test]
-        public void SortByMinDescending_JaggedArray_ExpectedSortedByMinElementsOfRowsArray()
-        {
-            int[][] actual = {
-                new int[] {1,3,6,7,9},
-                new int[] {0,25,0,0,0},
-                new int[] {11,22,24},
-                new int[] {13,15,42,-7,16}
-            };
-            int[][] expected = {
-                new int[] {11,22,24},
-                new int[] {1,3,6,7,9},
-                new int[] {0,25,0,0,0},
-                new int[] {13,15,42,-7,16}
-            };
-
-            BubbleSorter.SortByMinDescending(actual);
-
-            Assert.AreEqual(expected, actual);
-        }
         
         [TestCase(null)]
         public void SortBySumAscending_NullReferencedJaggedArray_ThrowsArgumentNullException(int[][] jaggedArray)
         {
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortBySumAscending(jaggedArray));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(jaggedArray, new SortBySumAscending()));
         }
 
         [TestCase(null)]
         public void SortBySumDescending_NullReferencedJaggedArray_ThrowsArgumentNullException(int[][] jaggedArray)
         {
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortBySumDescending(jaggedArray));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(jaggedArray, new SortBySumDescending()));
         }
 
         [TestCase(null)]
         public void SortByMaxAscending_NullReferencedJaggedArray_ThrowsArgumentNullException(int[][] jaggedArray)
         {
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMaxAscending(jaggedArray));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(jaggedArray, new SortByMaxAscending()));
         }
 
         [TestCase(null)]
         public void SortByMaxDescending_NullReferencedJaggedArray_ThrowsArgumentNullException(int[][] jaggedArray)
         {
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMaxDescending(jaggedArray));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(jaggedArray, new SortByMaxDescending()));
         }
 
-        [TestCase(null)]
-        public void SortByMinAscending_NullReferencedJaggedArray_ThrowsArgumentNullException(int[][] jaggedArray)
-        {
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMinAscending(jaggedArray));
-        }
-        
-
-        [TestCase(null)]
-        public void SortByMinDescending_NullReferencedJaggedArray_ThrowsArgumentNullException(int[][] jaggedArray)
-        {
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMinDescending(jaggedArray));
-        }
-
-
+     
         [TestCase()]
         public void SortBySumAscending_JaggedArrayWithNullReferencedRow_ThrowsArgumentNullException()
         {
@@ -190,7 +133,7 @@ namespace Task2.Tests
                 new int[] {11,22,24},
                 new int[] {13,15,42,-7,16}
             };
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortBySumAscending(actual));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(actual, new SortBySumAscending()));
         }
 
         [TestCase()]
@@ -202,7 +145,7 @@ namespace Task2.Tests
                 new int[] {11,22,24},
                 new int[] {13,15,42,-7,16}
             };
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortBySumDescending(actual));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(actual, new SortBySumDescending()));
         }
 
         [TestCase()]
@@ -214,7 +157,7 @@ namespace Task2.Tests
                 new int[] {11,22,24},
                 new int[] {13,15,42,-7,16}
             };
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMaxAscending(actual));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(actual, new SortByMaxAscending()));
         }
 
         [TestCase()]
@@ -226,51 +169,22 @@ namespace Task2.Tests
                 new int[] {11,22,24},
                 new int[] {13,15,42,-7,16}
             };
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMaxDescending(actual));
-        }
-
-        [TestCase()]
-        public void SortByMinAscending_JaggedArrayWithNullReferencedRow_ThrowsArgumentNullException()
-        {
-            int[][] actual = {
-                new int[] {1,3,6,7,9},
-                null,
-                new int[] {11,22,24},
-                new int[] {13,15,42,-7,16}
-            };
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMinAscending(actual));
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(actual, new SortByMaxDescending()));
         }
 
 
         [TestCase()]
-        public void SortByMinDescending_JaggedArrayWithNullReferencedRow_ThrowsArgumentNullException()
+        public void Sort_NullComparer_ThrowsArgumentNullException()
         {
             int[][] actual = {
                 new int[] {1,3,6,7,9},
-                null,
-                new int[] {11,22,24},
-                new int[] {13,15,42,-7,16}
-            };
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMinDescending(actual));
-        }
-
-
-
-        [Test]
-        public void SortBySumAscending_JaggedArray_Exc()
-        {
-            int[][] actual = {
                 new int[] {1,3,6,7,9},
-                null,
                 new int[] {11,22,24},
                 new int[] {13,15,42,-7,16}
             };
-           
-
-            Assert.Throws<ArgumentNullException>(() => BubbleSorter.SortByMinDescending(actual));
-
-           
+            Assert.Throws<ArgumentNullException>(() => BubbleSorter.Sort(actual, null));
         }
-        
+
     }
+ 
 }

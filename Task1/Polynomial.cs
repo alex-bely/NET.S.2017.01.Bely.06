@@ -3,19 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
+using System.Globalization;
 
 namespace Task1
 {
     /// <summary>
     /// Class for working with polynomials
     /// </summary>
-    public class Polynomial
+    public class Polynomial:ICloneable
     {
-        #region Properties
+        #region Private members
         /// <summary>
         /// Array with polynomial's coefficients
         /// </summary>
-        private double[] Coefficients { get; }
+        private double[] coefficients;
+        /// <summary>
+        /// Precision value
+        /// </summary>
+        private static double epsilon;
+
+
+        /// <summary>
+        /// Static constructor for initialization precision value
+        /// </summary>
+        static Polynomial()
+        {
+            epsilon = double.Parse(ConfigurationManager.AppSettings["epsilon"], CultureInfo.InvariantCulture);
+        }
+
 
         /// <summary>
         /// Degree of polynomial
@@ -23,64 +39,7 @@ namespace Task1
         private int Degree { get; }
         #endregion
 
-        #region Construcrors
-
-        /// <summary>
-        /// Creates new Polynomial object with given coefficient
-        /// </summary>
-        /// <param name="firstCoefficient">Polynomial's coefficient</param>
-
-        public Polynomial(double firstCoefficient)
-        {
-            this.Degree = 0;
-            Coefficients = new double[] { firstCoefficient };
-        }
-
-        /// <summary>
-        /// Creates new Polynomial object with given coefficients
-        /// </summary>
-        /// <param name="firstCoefficient">Polynomial's first coefficient</param>
-        /// <param name="secondCoefficient">Polynomial's second coefficient</param>
-        public Polynomial(double firstCoefficient, double secondCoefficient)
-        {
-            if (secondCoefficient == 0)
-            {
-                this.Degree = 0;
-                Coefficients = new double[] { firstCoefficient };
-            }
-            else
-            {
-                this.Degree = 1;
-                this.Coefficients = new double[] { firstCoefficient, secondCoefficient };
-            }
-
-        }
-
-        /// <summary>
-        /// Creates new Polynomial object with given coefficients
-        /// </summary>
-        /// <param name="firstCoefficient">Polynomial's first coefficient</param>
-        /// <param name="firstCoefficient">Polynomial's second coefficient</param>
-        /// <param name="thirdCoefficient">Polynomial's third coefficient</param>
-        public Polynomial(double firstCoefficient, double secondCoefficient, double thirdCoefficient)
-        {
-            if (thirdCoefficient == 0 && secondCoefficient == 0)
-            {
-                this.Degree = 0;
-                Coefficients = new double[] { firstCoefficient };
-            }
-            else if (thirdCoefficient == 0)
-            {
-                this.Degree = 1;
-                this.Coefficients = new double[] { firstCoefficient, secondCoefficient };
-            }
-            else
-            {
-                this.Degree = 2;
-                this.Coefficients = new double[] { firstCoefficient, secondCoefficient, thirdCoefficient };
-            }
-
-        }
+        #region Construcror
 
         /// <summary>
         /// Creates new Polynomial object with given coefficients
@@ -90,47 +49,65 @@ namespace Task1
         /// <exception cref="ArgumentOutOfRangeException">Array is blank</exception>
         public Polynomial(params double[] coefficients)
         {
-            if (coefficients == null)
+            if(ReferenceEquals(coefficients,null))
                 throw new ArgumentNullException(nameof(coefficients));
-            if (coefficients.Length==0) throw new ArgumentOutOfRangeException(nameof(coefficients));
+            
+            if (coefficients.Length==0) throw new ArgumentOutOfRangeException();
             this.Degree = coefficients.Length - 1;
             
-            while (coefficients[Degree] == 0 && Degree > 0)
+            while (Math.Abs(coefficients[Degree]) < epsilon && Degree > 0)
             {
                 Degree--;
             }
             
-            this.Coefficients = new double[Degree + 1];
-            Array.Copy(coefficients, this.Coefficients, Degree + 1);
+            this.coefficients = new double[Degree + 1];
+            Array.Copy(coefficients, this.coefficients, Degree + 1);
         }
 
-        /// <summary>
-        /// Creates new Polynomial object based on another polynomial
-        /// </summary>
-        /// <param name="polynomial">Base Polynomial object</param>
-        /// <exception cref="ArgumentNullException">Base polynomial is null referenced</exception>
-        
-        public Polynomial(Polynomial polynomial)
-        {
-            if (polynomial==null) throw new ArgumentNullException();
-            this.Degree = polynomial.Degree;
-            this.Coefficients = new double[polynomial.Coefficients.Length];
-            Array.Copy(polynomial.Coefficients, this.Coefficients, polynomial.Coefficients.Length);
-        }
         #endregion
+
+        public double this[int index]
+        {
+            get
+            {
+                if (index < 0 || index > coefficients.Length)
+                    throw new ArgumentOutOfRangeException();
+
+                return coefficients[index];
+            }
+        }
+
+
+
+     
+
 
         #region Operators
         /// <summary>
         /// Adds two polynomials
         /// </summary>
-        /// <param name="value1">First polynomial</param>
-        /// <param name="value2">Second polynomial</param>
+        /// <param name="lhs">First polynomial</param>
+        /// <param name="rhs">Second polynomial</param>
         /// <returns>Sum of polynomials</returns>
         /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-        public static Polynomial operator +(Polynomial value1, Polynomial value2)
+        public static Polynomial operator +(Polynomial lhs, Polynomial rhs)
         {
-            return new Polynomial(Polynomial.Add(value1, value2));
+            return Polynomial.Add(lhs, rhs);
         }
+
+
+        /// <summary>
+        /// Calculates the negation of two polynomials
+        /// </summary>
+        /// <param name="value">Source polynomial</param>
+        /// <returns>Negation of polynomials</returns>
+        /// <exception cref="ArgumentNullException">One of arguments is null</exception>
+        public static Polynomial operator -(Polynomial value)
+        {
+            return Polynomial.Negation(value);
+        }
+
+
 
         /// <summary>
         /// Calculates the substraction of two polynomials
@@ -139,9 +116,9 @@ namespace Task1
         /// <param name="value2">Second polynomial</param>
         /// <returns>Substraction of polynomials</returns>
         /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-        public static Polynomial operator -(Polynomial value1, Polynomial value2)
+        public static Polynomial operator -(Polynomial lhs, Polynomial rhs)
         {
-            return new Polynomial(Polynomial.Sub(value1, value2));
+            return Polynomial.Sub(lhs, rhs);
         }
 
         /// <summary>
@@ -151,9 +128,9 @@ namespace Task1
         /// <param name="value2">Second polynomial</param>
         /// <returns>Multiplication of polynomials</returns>
         /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-        public static Polynomial operator *(Polynomial value1, Polynomial value2)
+        public static Polynomial operator *(Polynomial lhs, Polynomial rhs)
         {
-            return new Polynomial(Polynomial.Mul(value1, value2));
+            return Polynomial.Mul(lhs, rhs);
         }
 
         /// <summary>
@@ -162,9 +139,14 @@ namespace Task1
         /// <param name="value1">First Polynomial variable</param>
         /// <param name="value2">Second Polynomial variable</param>
         /// <returns>Result of comparison: true if variables are equal, false if they are not</returns>
-        public static bool operator ==(Polynomial value1, Polynomial value2)
+        public static bool operator ==(Polynomial lhs, Polynomial rhs)
         {
-            return ReferenceEquals(value1, value2);
+            if (ReferenceEquals(lhs, rhs)) return true;
+            if (ReferenceEquals(lhs, null) /*|| ReferenceEquals(rhs,null)*/)
+                return false;
+
+            return lhs.Equals(rhs);
+
         }
 
         /// <summary>
@@ -173,9 +155,9 @@ namespace Task1
         /// <param name="value1">First Polynomial variable</param>
         /// <param name="value2">Second Polynomial variable</param>
         /// <returns>Result of comparison: true if variables are not equal, false if the are</returns>
-        public static bool operator !=(Polynomial value1, Polynomial value2)
+        public static bool operator !=(Polynomial lhs, Polynomial rhs)
         {
-            return !(value1 == value2);
+            return !(lhs == rhs);
         }
         #endregion
 
@@ -188,13 +170,31 @@ namespace Task1
         /// <returns>The result of the expression</returns>
         public double ValueAt(double value)
         {
-            int n = Coefficients.Length - 1;
-            double result = Coefficients[n];
+            int n = coefficients.Length - 1;
+            double result = coefficients[n];
             for (int i = n - 1; i >= 0; i--)
             {
-                result = value * result + Coefficients[i];
+                if(Math.Abs(coefficients[i])<epsilon)
+                    result = value * result + 0;
+                else
+                    result = value * result + coefficients[i];
             }
             return result;
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object</param>
+        /// <returns>True if the specified object is equal to the current Polynomial object; otherwise, false</returns>
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Polynomial)obj);
+            
         }
 
         /// <summary>
@@ -202,21 +202,23 @@ namespace Task1
         /// </summary>
         /// <param name="obj">The object to compare with the current Polynomial object</param>
         /// <returns>True if the specified object is equal to the current Polynomial object; otherwise, false</returns>
-        public override bool Equals(object obj)
+        public bool Equals(Polynomial other)
         {
-            if (ReferenceEquals(this, obj))
-                return true;
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
 
-            Polynomial temp = obj as Polynomial;
-            if (temp == null) return false;
+            if (this.coefficients.Length != other.coefficients.Length)
+                return false;
 
-            if (this.Coefficients.Length != temp.Coefficients.Length) return false;
-            for (int i = 0; i < Coefficients.Length; i++)
+            for (int i = 0; i < this.coefficients.Length; i++)
             {
-                if (this.Coefficients[i] != temp.Coefficients[i]) return false;
+                if (!this.coefficients[i].Equals(other.coefficients[i]))
+                    return false;
             }
             return true;
         }
+
+
 
         /// <summary>
         /// Represents the current polynomial
@@ -225,23 +227,24 @@ namespace Task1
         /// <exception cref="ArgumentNullException">Polynomial is null referenced</exception>
         public override string ToString()
         {
-            if (this == null) throw new ArgumentNullException();
-            if (Degree == 0) return Coefficients[0].ToString();
+            
+            if (Degree == 0) return coefficients[0].ToString();
 
             StringBuilder temp = new StringBuilder();
-            temp.Append(Coefficients[Degree] + "x^" + Degree);
+            temp.Append(coefficients[Degree] + "x^" + Degree);
 
             for (int i = Degree - 1; i > 0; i--)
-                if (Coefficients[i] > 0)
-                    temp.Append("+" + Coefficients[i] + "x^" + i);
-                else
+                if (coefficients[i] > epsilon)
+                    temp.Append("+" + coefficients[i] + "x^" + i);
+                else if (coefficients[i] < -epsilon)
                 {
-                    temp.Append(Coefficients[i] + "x^" + i);
+                    temp.Append(coefficients[i] + "x^" + i);
                 }
 
-            if (Coefficients[0] > 0)
-                temp.Append("+" + Coefficients[0]);
-            else temp.Append(Coefficients[0]);
+            if (coefficients[0] > epsilon)
+                temp.Append("+" + coefficients[0]);
+            else if (coefficients[0] < -epsilon)
+                temp.Append(coefficients[0]);
 
             return temp.ToString();
         }
@@ -253,99 +256,123 @@ namespace Task1
         public override int GetHashCode()
         {
             int hash = 0;
-            for (int i = 0; i < this.Coefficients.Length; i++)
-                hash += (Coefficients[i] + i).GetHashCode();
+            for (int i = 0; i < this.coefficients.Length; i++)
+                hash += (coefficients[i] + i).GetHashCode();
             return hash;
         }
-        #endregion
-
-        #region Private methods
+        
+        
         /// <summary>
         /// Adds two polynomials
         /// </summary>
-        /// <param name="value1">First polynomial</param>
-        /// <param name="value2">Second polynomial</param>
+        /// <param name="lhs">First polynomial</param>
+        /// <param name="rhs">Second polynomial</param>
         /// <returns>Sum of polynomials</returns>
         /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-        private static Polynomial Add(Polynomial value1, Polynomial value2)
+        public static Polynomial Add(Polynomial lhs, Polynomial rhs)
         {
-            if (value1 == null || value2 == null) throw new ArgumentNullException();
-            
-            if (value1.Coefficients.Length >= value2.Coefficients.Length)
+            if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+                throw new ArgumentNullException();
+
+            if (lhs.coefficients.Length >= rhs.coefficients.Length)
             {
-                double[] newCoefficients = new double[value1.Coefficients.Length];
-                Array.Copy(value1.Coefficients, newCoefficients, value1.Coefficients.Length);
-                for (int i = 0; i < value2.Coefficients.Length; i++)
+                double[] newCoefficients = new double[lhs.coefficients.Length];
+                Array.Copy(lhs.coefficients, newCoefficients, lhs.coefficients.Length);
+                for (int i = 0; i < rhs.coefficients.Length; i++)
                 {
-                    newCoefficients[i] += value2.Coefficients[i];
+                    newCoefficients[i] += rhs.coefficients[i];
                 }
                 return new Polynomial(newCoefficients);
             }
             else
             {
-                double[] newCoefficients = new double[value2.Coefficients.Length];
-                Array.Copy(value2.Coefficients, newCoefficients, value2.Coefficients.Length);
-                for (int i = 0; i < value1.Coefficients.Length; i++)
+                double[] newCoefficients = new double[rhs.coefficients.Length];
+                Array.Copy(rhs.coefficients, newCoefficients, rhs.coefficients.Length);
+                for (int i = 0; i < lhs.coefficients.Length; i++)
                 {
-                    newCoefficients[i] += value1.Coefficients[i];
+                    newCoefficients[i] += lhs.coefficients[i];
                 }
                 return new Polynomial(newCoefficients);
             }
         }
+
+        /// <summary>
+        /// Calculates the negation of the polynomial
+        /// </summary>
+        /// <param name="valur">Source polynomial</param>
+        /// <returns>The negation of the polynomial</returns>
+        /// <exception cref="ArgumentNullException">Argument is null</exception>
+        public static Polynomial Negation(Polynomial value)
+        {
+            if (ReferenceEquals(value, null))
+                throw new ArgumentNullException();
+
+            double[] newCoefficients = new double[value.Degree + 1];
+            for (int i = 0; i < newCoefficients.Length; i++)
+                newCoefficients[i] = -value.coefficients[i];
+            return new Polynomial(newCoefficients);
+        }
+
+
 
         /// <summary>
         /// Calculates the substraction of two polynomials
         /// </summary>
-        /// <param name="value1">First polynomial</param>
-        /// <param name="value2">Second polynomial</param>
+        /// <param name="lhs">First polynomial</param>
+        /// <param name="rhs">Second polynomial</param>
         /// <returns>Substraction of polynomials</returns>
         /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-        private static Polynomial Sub(Polynomial value1, Polynomial value2)
+        public static Polynomial Sub(Polynomial lhs, Polynomial rhs)
         {
-            if (value1 == null || value2 == null) throw new ArgumentNullException();
+            if (ReferenceEquals(lhs, null) || ReferenceEquals(rhs, null))
+                throw new ArgumentNullException();
 
-
-            if (value1.Coefficients.Length >= value2.Coefficients.Length)
-            {
-                double[] newCoefficients = new double[value1.Coefficients.Length];
-                Array.Copy(value1.Coefficients, newCoefficients, value1.Coefficients.Length);
-                for (int i = 0; i < value2.Coefficients.Length; i++)
-                {
-                    newCoefficients[i] -= value2.Coefficients[i];
-                }
-                return new Polynomial(newCoefficients);
-            }
-            else
-            {
-                double[] newCoefficients = new double[value2.Coefficients.Length];
-                Array.Copy(value2.Coefficients, newCoefficients, value2.Coefficients.Length);
-                for (int i = 0; i < value1.Coefficients.Length; i++)
-                {
-                    newCoefficients[i] -= value1.Coefficients[i];
-                }
-                return new Polynomial(newCoefficients);
-            }
+            return Polynomial.Add(lhs,Polynomial.Negation(rhs));
+            
+            
         }
 
         /// <summary>
         /// Mutliplies two polynomials
         /// </summary>
-        /// <param name="value1">First polynomial</param>
-        /// <param name="value2">Second polynomial</param>
+        /// <param name="lhs">First polynomial</param>
+        /// <param name="rhs">Second polynomial</param>
         /// <returns>Multiplication of polynomials</returns>
         /// <exception cref="ArgumentNullException">One of arguments is null</exception>
-        private static Polynomial Mul(Polynomial value1, Polynomial value2)
+        public static Polynomial Mul(Polynomial lhs, Polynomial rhs)
         {
-            if (value1 == null || value2 == null) throw new ArgumentNullException();
-            int tempDegree = value1.Degree + value2.Degree;
+            if (lhs == null || rhs == null) throw new ArgumentNullException();
+            int tempDegree = lhs.Degree + rhs.Degree;
             double[] newPol = new double[tempDegree + 1];
-            for (int i = value1.Degree; i >= 0; i--)
-                for (int j = value2.Degree; j >= 0; j--)
-                    newPol[i + j] += value1.Coefficients[i] * value2.Coefficients[j];
+            for (int i = lhs.Degree; i >= 0; i--)
+                for (int j = rhs.Degree; j >= 0; j--)
+                    newPol[i + j] += lhs.coefficients[i] * rhs.coefficients[j];
 
             return new Polynomial(newPol);
             
         }
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        /// <returns>New object that is a copy of the current instance</returns>
+
+        object ICloneable.Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        /// <summary>
+        /// Creates a new polynomial that is a copy of the current Polynomial.
+        /// </summary>
+        /// <returns>New polynomial that is a copy of the current Polynomial.</returns>
+
+        public Polynomial Clone()
+        {
+            
+            return new Polynomial(this.coefficients);
+        }
         #endregion
+
     }
 }
