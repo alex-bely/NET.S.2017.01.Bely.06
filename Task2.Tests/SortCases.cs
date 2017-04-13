@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace Task2.Tests
 {
 
+    
     /// <summary>
     /// Implements a method to compare two integer arrays
     /// </summary>
@@ -18,16 +19,17 @@ namespace Task2.Tests
         /// </summary>
         /// <param name = "lhs">First array for comparison</param>
         /// <param name = "rhs">Second array for comparison</param>
-        /// <exception cref="ArgumentNullException">One of arguments is null referenced</exception>
+        /// <returns>An integer that indicates the relative values of lhs and rhs</returns>
         public int Compare(int[] lhs, int[] rhs)
         {
-            if (lhs == null || rhs == null) throw new ArgumentNullException();
-
-            if (lhs.Sum() > rhs.Sum())
-                return 1;
-            else if (lhs.Sum() < rhs.Sum())
+            if (ReferenceEquals(lhs, rhs))
+                return 0;
+            if (ReferenceEquals(lhs, null))
                 return -1;
-            else return 0;
+            if (ReferenceEquals(rhs, null))
+                return 1;
+
+            return lhs.Sum().CompareTo(rhs.Sum());
         }
     }
 
@@ -42,16 +44,14 @@ namespace Task2.Tests
         /// </summary>
         /// <param name = "lhs">First array for comparison</param>
         /// <param name = "rhs">Second array for comparison</param>
-        /// <exception cref="ArgumentNullException">One of arguments is null referenced</exception>
+        /// <returns>An integer that indicates the relative values of lhs and rhs</returns>
         public int Compare(int[] lhs, int[] rhs)
         {
-            if (lhs == null || rhs == null) throw new ArgumentNullException();
+            if (ReferenceEquals(lhs, rhs))  return 0;
+            if (ReferenceEquals(lhs, null)) return 1;
+            if (ReferenceEquals(rhs, null)) return -1;
 
-            if (lhs.Sum() > rhs.Sum())
-                return -1;
-            else if (lhs.Sum() < rhs.Sum())
-                return 1;
-            else return 0;
+            return rhs.Sum().CompareTo(lhs.Sum());
         }
     }
 
@@ -66,16 +66,17 @@ namespace Task2.Tests
         /// </summary>
         /// <param name = "lhs">First array for comparison</param>
         /// <param name = "rhs">Second array for comparison</param>
-        /// <exception cref="ArgumentNullException">One of arguments is null referenced</exception>
+        /// <returns>An integer that indicates the relative values of lhs and rhs</returns>
         public int Compare(int[] lhs, int[] rhs)
         {
-            if (lhs == null || rhs == null) throw new ArgumentNullException();
-
-            if (lhs.Max() > rhs.Max())
-                return 1;
-            else if (lhs.Max() < rhs.Max())
+            if (ReferenceEquals(lhs, rhs))
+                return 0;
+            if (ReferenceEquals(lhs, null))
                 return -1;
-            else return 0;
+            if (ReferenceEquals(rhs, null))
+                return 1;
+
+            return lhs.Max().CompareTo(rhs.Max());
         }
     }
 
@@ -91,18 +92,18 @@ namespace Task2.Tests
         /// </summary>
         /// <param name = "lhs">First array for comparison</param>
         /// <param name = "rhs">Second array for comparison</param>
-        /// <exception cref="ArgumentNullException">One of arguments is null referenced</exception>
+        /// <returns>An integer that indicates the relative values of lhs and rhs</returns>
         public int Compare(int[] lhs, int[] rhs)
         {
-            if (lhs == null || rhs == null) throw new ArgumentNullException();
-
-            if (lhs.Max() > rhs.Max())
-                return -1;
-            else if (lhs.Max() < rhs.Max())
+            if (ReferenceEquals(lhs, rhs))
+                return 0;
+            if (ReferenceEquals(lhs, null))
                 return 1;
-            else return 0;
+            if (ReferenceEquals(rhs, null))
+                return -1;
+
+            return rhs.Max().CompareTo(lhs.Max());
         }
     }
     
-
 }
