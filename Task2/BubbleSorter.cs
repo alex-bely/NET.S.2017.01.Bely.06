@@ -34,7 +34,7 @@ namespace Task2
         /// <param name="array">Jagged array for sorting</param>
         /// <param name="comparer">Delegate with the rule of comparing</param>
         /// <exception cref="ArgumentNullException">Comparer is null referenced</exception>
-        public static void Sort(int[][] array, Func<int[],int[],int> comparer)
+        public static void Sort(int[][] array, Comparison<int[]> comparer)
         {
             if (comparer == null)
                 throw new ArgumentNullException();
@@ -44,18 +44,18 @@ namespace Task2
 
         #endregion
 
-        #region Private and internal members
+        #region Private members
         /// <summary>
         /// Creates comparer based on delegate
         /// </summary>
-        internal class DelegateToComparer:IComparer
+        private class DelegateToComparer:IComparer
         {
-            private Func<int[], int[], int> localFunc;
+            private Comparison<int[]> localFunc;
             /// <summary>
             /// Initialize local delegate with external delegate
             /// </summary>
             /// <param name="source">External delegate</param>
-            internal DelegateToComparer(Func<int[],int[],int> source)
+            public DelegateToComparer(Comparison<int[]> source)
             {
                 localFunc = source;
             }
